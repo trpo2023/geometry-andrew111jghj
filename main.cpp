@@ -9,6 +9,9 @@ using namespace std;
 
 void to_lower(std::string& s);
 void err_msg(std::string str, int index, std::string err_msg);
+int define_figure(std::string str);
+enum Arguments { NUM, DOT };
+const vector<string> name_object = { "circle" };
 
 struct Coord {
     int x;
@@ -56,6 +59,12 @@ int main() {
             cout << strr << endl;
         }
     }
+    int index = define_figure(strr);
+    if (index == -1) {
+        err_msg(
+            strr, 0, "expected 'circle'");
+        return 1;
+    }
 
     return 0;
 }
@@ -75,4 +84,16 @@ void err_msg(std::string str, int index, std::string err_msg)
     }
     std::cout << "^" << std::endl
         << "Error at column " << index << ": " + err_msg << std::endl;
+}
+
+int define_figure(std::string str)
+{
+    int index = -1;
+    for (size_t i = 0; i < name_object.size(); i++) {
+        if (str.find(name_object[i]) == 0) {
+            index = i;
+            break;
+        };
+    }
+    return index;
 }
