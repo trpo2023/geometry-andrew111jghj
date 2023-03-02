@@ -8,6 +8,7 @@
 using namespace std;
 
 void to_lower(std::string& s);
+void err_msg(std::string str, int index, std::string err_msg);
 
 struct Coord {
     int x;
@@ -64,4 +65,14 @@ void to_lower(std::string& s)
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) {
         return std::tolower(c);
         });
+}
+
+void err_msg(std::string str, int index, std::string err_msg)
+{
+    std::cerr << str << std::endl;
+    for (int i = 0; i < index - 1; i++) {
+        std::cout << " ";
+    }
+    std::cout << "^" << std::endl
+        << "Error at column " << index << ": " + err_msg << std::endl;
 }
