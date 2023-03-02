@@ -10,8 +10,13 @@ using namespace std;
 void to_lower(std::string& s);
 void err_msg(std::string str, int index, std::string err_msg);
 int define_figure(std::string str);
+void prun_str(std::string& str);
+
 enum Arguments { NUM, DOT };
 const vector<string> name_object = { "circle" };
+const map<const string, const vector<Arguments>> arg_object = { {
+        {"circle", {DOT, NUM}},
+} };
 
 struct Coord {
     int x;
@@ -56,18 +61,74 @@ int main() {
         while (getline(fp, strr)) {
 
             to_lower(strr);
-            cout << strr << endl;
-        }
-    }
-    int index = define_figure(strr);
-    if (index == -1) {
-        err_msg(
-            strr, 0, "expected 'circle'");
-        return 1;
-    }
+            int index = define_figure(strr);
+            if (index == -1) {
+                err_msg(
+                    strr, 0, "expected 'circle'");
+                return 1;
+            }
+            const string name = name_object[index];
+            const vector<Arguments> args = arg_object.at(name);
+            vector<Coord> dots = {};
+            vector<double> numb = {};
+            size_t s_1 = strr.find("(");
+            size_t s_2 = strr.find_last_of(")");
 
-    return 0;
-}
+            while (strr[s_1] == '(' && strr[s_2] == ')') {
+                s_1++;
+                s_2--;
+            }
+            if (strr[s_1] != '(' && strr[s_2] == ')') {
+                err_msg(strr, s_1 + 2, "'(' expected");
+                return 1;
+            }
+            if (strr[s_1] == '(' && strr[s_2] != ')') {
+                err_msg(strr, s_2 + 2, "')' expected");
+                return 1;
+            }
+            string arg = "";
+            int arg_num = 0;
+            double rad = 0;
+            for (size_t i = s_1; i <= s_2 + 1; i++) {
+                if (strr[i] == ',' || i == s_2 + 1) {
+                    prun_str(arg);
+                    if (args[arg_num] == DOT) {
+                        dots.push_back(Coord::convert_symbol(arg));
+                    }
+
+                    if (args[arg_num] == NUM) {
+                        numb.push_back(stod(arg));
+                        if (name == "circle") {
+                            rad = stod(arg);
+                        }
+                    }
+
+                    arg_num++;
+                    arg.clear();
+                    continue;
+                }
+
+                arg += strr[i];
+            }
+
+            if (dots.size() + numb.size()
+                != arg_object.at(name).size()) {
+                err_msg(strr, s_2, "expected " + to_string(arg_object.at(name).size()) + ", but got " + to_string(dots.size()) + " arguments!");
+                return 1;
+            }
+
+            cout << name << " ( ";
+            for (Coord exd : dots) {
+                cout << exd.x << " " << exd.y << " ";
+            }
+            if (name == "circle") {
+                cout << rad << " ";
+            }
+            cout << ")" << endl;
+        }
+        return 0;
+    }
+};
 
 void to_lower(std::string& s)
 {
@@ -96,4 +157,16 @@ int define_figure(std::string str)
         };
     }
     return index;
+}
+
+void prun_str(std::string& str)
+{
+    size_t start = str.find_first_not_of(' ');
+    if (start != std::string::npos) {
+        str.erase(0, start);
+    }
+    size_t end = str.find_last_not_of(' ');
+    if (end != std::string::npos) {
+        str.erase(end + 1);
+    }
 }
