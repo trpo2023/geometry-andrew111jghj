@@ -30,6 +30,7 @@ FILE* file_open() {
 }
 
 char** file_read(FILE* fp, int& str_count) {
+    char sym;
     int count = 1, str_num = 0;
     while (!feof(fp)) {
         sym = fgetc(fp);
@@ -68,7 +69,6 @@ char** file_read(FILE* fp, int& str_count) {
 }
 
 void error_handler(char* str) {
-    char sym;
     int i = 0;
     int len = strlen("circle");
     if (str[len] == ')') {    //check left bracket
