@@ -1,26 +1,34 @@
-.PHONY: clean run
 TARGET = main
 CC = g++
 CFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -MMD
-WAY_SOURCE = ./src/
-WAY_OBJECT = ./obj/
+WAY_SOURCE_CODE_FILES = src/libgeometry/
+WAY_SOURCE_MAIN = src/geometry/
+WAY_OBJECT_FILES = obj/src/geometry/
+WAY_OBJECT_LIB = obj/src/libgeometry/
+WAY_TARGET = bin/
 
-SOURCE = $(wildcard $(WAY_SOURCE)*.cpp)
-OBJECT = $(patsubst $(WAY_SOURCE)%.cpp, $(WAY_OBJECT)%.o, $(SOURCE))
+SOURCE_CODE_FILES = $(wildcard $(WAY_SOURCE_CODE_FILES)*.cpp)
+OBJECT_CODE_FILES = $(patsubst $(WAY_SOURCE_CODE_FILES)%.cpp, $(WAY_OBJECT_FILES)%.o, $(SOURCE_CODE_FILES))
+SOURCE_MAIN = $(WAY_SOURCE_MAIN)main.cpp
 
-$(TARGET) : $(WAY_OBJECT)main.o $(WAY_OBJECT)libcompute.a
-	$(CC) $(CFLAGS) $(OBJECT) -L$(WAY_OBJECT) -lcompute -o $(TARGET)
+$(WAY_TARGET)$(TARGET) : $(WAY_OBJECT_FILES)main.o $(WAY_OBJECT_LIB)libmy.a
+	$(CC) $(CFLAGS) $(OBJECT_CODE_FILES) $(WAY_OBJECT_FILES)main.o -L$(WAY_OBJECT_LIB) -lmy -o $(WAY_TARGET)$(TARGET)
 
-$(WAY_OBJECT)%.o : $(WAY_SOURCE)%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+$(WAY_OBJECT_FILES)%.o : $(WAY_SOURCE_CODE_FILES)%.cpp
+	$(CC) -c -I$(WAY_SOURCE_CODE_FILES) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-$(WAY_OBJECT)libcompute.a : $(WAY_OBJECT)compute.o
+$(WAY_OBJECT_FILES)main.o : $(WAY_SOURCE_MAIN)main.cpp
+	$(CC) -c -I$(WAY_SOURCE_CODE_FILES) $(CFLAGS) $(CPPFLAGS) $< -o $@
+
+$(WAY_OBJECT_LIB)libmy.a : $(OBJECT_CODE_FILES)
 	ar rcs $@ $^
 run :
-	./main
+	./$(WAY_TARGET)$(TARGET)
 
 clean : 
-	rm $(TARGET) $(WAY_OBJECT)*.o $(WAY_OBJECT)*.d $(WAY_OBJECT)*.a
+	rm $(WAY_TARGET)$(TARGET) $(WAY_OBJECT_FILES)*.[od] $(WAY_OBJECT_LIB)*.a
 
--include $(WAY_OBJECT)main.d $(WAY_OBJECT)compute.d
+.PHONY: clean run
+
+-include $(wildcard $(WAY_OBJECT_FILES)*.d)
