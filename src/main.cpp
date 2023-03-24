@@ -1,26 +1,40 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "compute.h"
 
 FILE* file_open();
 char** file_read(FILE* fp, int& str_count);
-void error_handler(char* str);
+int error_handler(char* str);
+
+double* get_args(char* str);
 
 int main() {
     FILE* fp = file_open();
     int str_count = 0;
     char** list = file_read(fp, str_count);
+    double** args = (double**)malloc(str_count * sizeof(double*));
     for (int i = 0; i < str_count; i++) {
         puts(list[i]);
-
-        error_handler(list[i]);
+        if (error_handler(list[i]) && get_args(list[i])) {
+            args[i] = (double*)malloc(3 * sizeof(double));
+            for (int j = 0; j < 3; j++)
+                args[i][j] = get_args(list[i])[j];
+            if (args[i][2] < 0) {
+                printf("Radius cannot be negative!\n\n");
+                continue;
+            }
+            else {
+                printf(" perimeter = %g", perim(args[i]));
+                printf("\n area = %g", area(args[i]));
+            }
+        }
+        else args[i] = NULL;
         printf("\n\n");
     }
+    free(args);
     return 0;
 }
 
 FILE* file_open() {
+
     FILE* fp;
     if ((fp = fopen("Input.txt", "r")) == NULL) {
         printf("\nInvalid to open file\n");
@@ -30,6 +44,7 @@ FILE* file_open() {
 }
 
 char** file_read(FILE* fp, int& str_count) {
+
     char sym;
     int count = 1, str_num = 0;
     while (!feof(fp)) {
@@ -68,47 +83,78 @@ char** file_read(FILE* fp, int& str_count) {
     return list;
 }
 
-void error_handler(char* str) {
+int error_handler(char* str) {
     int i = 0;
     int len = strlen("circle");
     if (str[len] == ')') {    //check left bracket
         for (int j = 0; j < len; j++)
             printf(" ");
         printf("^\nError at column %d: expected '('\n", (int)len);
-        return;
+        return 0;
     }
     while (str[i] != '(') {
         if (i >= len) {    //check name
             printf("^\nError at column 0: expected 'circle'\n");
-            return;
+            return 0;
         }
         i++;
     }
     i++;
     while (str[i] != ')') {
-        if ((str[i] == '\0' || str[i] == '(') && (str[i - 1] == '(' || isdigit(str[i - 1]) || str[i - 1] == ' ')) {
+        if ((str[i] == '\0' || str[i] == '(' || str[i] == '\r') && (str[i - 1] == '(' || isdigit(str[i - 1]) || str[i - 1] == ' ')) {
             for (int j = 0; j < i; j++)
                 printf(" ");
             printf("^\nError at column %d: expected ')'\n", i);
-            return;
+            return 0;
         }
         if ((!isdigit(str[i]) && str[i] != ' ' && str[i] != ',' && str[i] != '-' && str[i] != '.') || (str[i] == '-' && !isdigit(str[i + 1]))
             || (str[i] == '.' && (!isdigit(str[i + 1]) || !isdigit(str[i - 1]))) || (str[i] == ',' && (!isdigit(str[i - 1]) || isdigit(str[i + 1])))) {
             for (int j = 0; j < i; j++)
                 printf(" ");
             printf("^\nError at column %d: expected '<double>'\n", i);
-            return;
+            return 0;
         }
         i++;
     }
     i++;
     while (str[i] != '\0') {
-        if (str[i] != ' ') {
+        if (str[i] != ' ' && str[i] != '\r') {
             for (int j = 0; j < i; j++)
                 printf(" ");
             printf("^\nError at column %d: unexpected token\n", i);
-            return;
+            return 0;
         }
         i++;
     }
+    return 1;
+}
+
+double* get_args(char* str) {
+
+    static double args[3] = { 0 };
+    int i = strlen("circle"), num_count = 0, args_count = 0;
+    char num[10] = "";
+    while (str[i - 1] != ')') {
+        if (isdigit(str[i]))
+            num[num_count++] = str[i];
+        else if (str[i] == '.' || str[i] == '-')
+            num[num_count++] = str[i];
+        else if (strcmp(num, "")) {
+            if (args_count > 2) {
+                printf("Error: too many arguments");
+                return NULL;
+            }
+            num[num_count] = '\0';
+            args[args_count++] = strtod(num, NULL);
+            strcpy(num, "");
+            num_count = 0;
+        }
+
+        i++;
+    }
+    if (args_count <= 2) {
+        printf("Error: too low arguments");
+        return NULL;
+    }
+    return args;
 }
