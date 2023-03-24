@@ -1,7 +1,7 @@
 #include "get_args.h"
-double* get_args(char* str) {
-
-    static double args[3] = { 0 };
+double* get_args(char* str)
+{
+    static double args[3] = {0};
     int i = strlen("circle"), num_count = 0, args_count = 0;
     char num[10] = "";
     while (str[i - 1] != ')') {

@@ -27,7 +27,7 @@ run :
 	./$(WAY_TARGET)$(TARGET)
 
 clean : 
-	rm $(WAY_TARGET)$(TARGET) $(WAY_OBJECT_FILES)*.[od]
+	rm $(WAY_TARGET)$(TARGET) $(WAY_OBJECT_FILES)*.[od] $(WAY_OBJECT_LIB)*.a
 
 .PHONY: clean run
 

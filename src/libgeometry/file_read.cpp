@@ -1,7 +1,7 @@
 #include "file_read.h"
 
-FILE* file_open() {
-
+FILE* file_open()
+{
     FILE* fp;
     if ((fp = fopen("Input.txt", "r")) == NULL) {
         printf("\nInvalid to open file\n");
@@ -10,8 +10,8 @@ FILE* file_open() {
     return fp;
 }
 
-char** file_read(FILE* fp, int& str_count) {
-
+char** file_read(FILE* fp, int& str_count)
+{
     char sym;
     int count = 1, str_num = 0;
     while (!feof(fp)) {
@@ -39,7 +39,6 @@ char** file_read(FILE* fp, int& str_count) {
                 list[str_num][count - 1] = tolower(sym);
             }
             if (sym == '\n' || sym == EOF) {
-
                 list[str_num][count - 1] = '\0';
                 count = 0;
                 str_num++;

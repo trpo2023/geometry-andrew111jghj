@@ -1,9 +1,10 @@
 #include "compute.h"
-#include "file_read.h"
 #include "error_handler.h"
+#include "file_read.h"
 #include "get_args.h"
 
-int main() {
+int main()
+{
     FILE* fp = file_open();
     int str_count = 0;
     char** list = file_read(fp, str_count);
@@ -17,20 +18,14 @@ int main() {
             if (args[i][2] < 0) {
                 printf("Radius cannot be negative!\n\n");
                 continue;
-            }
-            else {
+            } else {
                 printf(" perimeter = %g", perim(args[i]));
                 printf("\n area = %g", area(args[i]));
             }
-        }
-        else args[i] = NULL;
+        } else
+            args[i] = NULL;
         printf("\n\n");
     }
     free(args);
     return 0;
 }
-
-
-
-
-
