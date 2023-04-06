@@ -1,17 +1,25 @@
 #include "error_handler.h"
-int error_handler(char* str)
+int error_handler(char* str, int out_flag)
 {
     int i = 0;
     int len = strlen("circle");
     if (str[len] == ')') { // check left bracket
         for (int j = 0; j < len; j++)
             printf(" ");
-        printf("^\nError at column %d: expected '('\n", (int)len);
+
+        if (out_flag)
+            printf("^\nError at column %d: expected '('\n", (int)len);
+        else
+            printf("\n");
         return 0;
     }
     while (str[i] != '(') {
         if (i >= len) { // check name
-            printf("^\nError at column 0: expected 'circle'\n");
+
+            if (out_flag)
+                printf("^\nError at column 0: expected 'circle'\n");
+            else
+                printf("\n");
             return 0;
         }
         i++;
@@ -23,7 +31,11 @@ int error_handler(char* str)
                 || str[i - 1] == ' ')) {
             for (int j = 0; j < i; j++)
                 printf(" ");
-            printf("^\nError at column %d: expected ')'\n", i);
+
+            if (out_flag)
+                printf("^\nError at column %d: expected ')'\n", i);
+            else
+                printf("\n");
             return 0;
         }
         if ((!isdigit(str[i]) && str[i] != ' ' && str[i] != ',' && str[i] != '-'
@@ -34,7 +46,11 @@ int error_handler(char* str)
                 && (!isdigit(str[i - 1]) || isdigit(str[i + 1])))) {
             for (int j = 0; j < i; j++)
                 printf(" ");
-            printf("^\nError at column %d: expected '<double>'\n", i);
+
+            if (out_flag)
+                printf("^\nError at column %d: expected '<double>'\n", i);
+            else
+                printf("\n");
             return 0;
         }
         i++;
@@ -44,7 +60,11 @@ int error_handler(char* str)
         if (str[i] != ' ' && str[i] != '\r') {
             for (int j = 0; j < i; j++)
                 printf(" ");
-            printf("^\nError at column %d: unexpected token\n", i);
+
+            if (out_flag)
+                printf("^\nError at column %d: unexpected token\n", i);
+            else
+                printf("\n");
             return 0;
         }
         i++;

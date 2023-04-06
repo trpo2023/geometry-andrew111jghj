@@ -1,4 +1,5 @@
 #include "get_args.h"
+
 double* get_args(char* str)
 {
     static double args[3] = {0};
