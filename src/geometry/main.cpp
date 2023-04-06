@@ -1,7 +1,9 @@
 #include "compute.h"
 #include "error_handler.h"
+#include "file_open.h"
 #include "file_read.h"
 #include "get_args.h"
+#include "intersect.h"
 
 int main()
 {
@@ -9,21 +11,41 @@ int main()
     int str_count = 0;
     char** list = file_read(fp, str_count);
     double** args = (double**)malloc(str_count * sizeof(double*));
-    for (int i = 0; i < str_count; i++) {
-        puts(list[i]);
-        if (error_handler(list[i]) && get_args(list[i])) {
-            args[i] = (double*)malloc(3 * sizeof(double));
-            for (int j = 0; j < 3; j++)
-                args[i][j] = get_args(list[i])[j];
-            if (args[i][2] < 0) {
-                printf("Radius cannot be negative!\n\n");
-                continue;
-            } else {
-                printf(" perimeter = %g", perim(args[i]));
-                printf("\n area = %g", area(args[i]));
-            }
+    int if_intersect;
+    for (int j = 0; j < str_count; j++)
+        if (error_handler(list[j], 0) == 1) {
+            args[j] = (double*)malloc(3 * sizeof(double));
+            if (args[j] != NULL)
+                for (int k = 0; k < 3; k++)
+                    args[j][k] = get_args(list[j])[k];
         } else
-            args[i] = NULL;
+            args[j] = NULL;
+
+    for (int i = 0; i < str_count; i++) {
+        if (args[i] == NULL) {
+            puts(list[i]);
+            error_handler(list[i], 1);
+            continue;
+        }
+        puts(list[i]);
+        error_handler(list[i], 1);
+        if (args[i][2] >= 0) {
+            printf(" perimeter = %g", perim(args[i]));
+            printf("\n area = %g", area(args[i]));
+            if_intersect = 1;
+            for (int j = 0; j < str_count; j++)
+                if (j != i && args[i] != NULL && args[j] != NULL
+                    && intersect(args[j], args[i])) {
+                    if (if_intersect) {
+                        printf("\n intersects:");
+                        if_intersect = 0;
+                    }
+                    printf("\n  %d. circle\n", j);
+                }
+        } else {
+            printf("Radius cannot be negative!\n\n");
+            continue;
+        }
         printf("\n\n");
     }
     free(args);
