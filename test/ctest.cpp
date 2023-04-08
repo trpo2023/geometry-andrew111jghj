@@ -1,7 +1,7 @@
-#include <ctest.h>
-#include "file_open.h"
 #include "compute.h"
+#include "file_open.h"
 #include "intersect.h"
+#include <ctest.h>
 
 CTEST(ctest, not_null_pointer)
 {
