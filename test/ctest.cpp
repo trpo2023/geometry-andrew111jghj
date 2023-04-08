@@ -31,7 +31,7 @@ CTEST(ctest, area)
 
 CTEST(ctest, intersection)
 {
-    double circ1[3]={0.8, 1.9, 2.3}, circ2[3]={105, 1.9, 2.5};
+    double circ1[3] = {0.8, 1.9, 2.3}, circ2[3] = {105, 1.9, 2.5};
     double expected = 0;
     double result = intersect(circ1, circ2);
     ASSERT_EQUAL(expected, result);
